@@ -1,5 +1,10 @@
 package main
 
+import (
+	"strings"
+	"unicode"
+)
+
 func (m *Model) ToggleUp() {
 	curr := m.cursor
 	if curr == 0 {
@@ -40,9 +45,16 @@ func (m *Model) ToggleDone() {
 
 func (m *Model) AddTask() {
 	newTask := m.newTask.Value()
+	newTask = strings.TrimSpace(newTask)
+	newTask = Title(newTask)
 	if newTask != "" {
 		m.tasks = append(m.tasks, task{title: newTask})
 		m.newTask.SetValue("")
 		m.adding = false
 	}
+}
+func Title(s string) string {
+	r := []rune(s)
+	r[0] = unicode.ToUpper(r[0])
+	return string(r)
 }

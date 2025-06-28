@@ -39,7 +39,7 @@ func (m *Model) ReadFromFile() error {
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		line := scanner.Text()
-		line = strings.Trim(line, " ")
+		line = strings.TrimSpace(line)
 		if line != "" {
 			m.tasks = append(m.tasks, task{title: line})
 		}
