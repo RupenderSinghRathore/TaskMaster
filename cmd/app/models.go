@@ -74,10 +74,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case "ctrl+up":
 			m.ToggleUp()
-			m.cursor++
 		case "ctrl+down":
 			m.ToggleDown()
-			m.cursor--
 
 		case "ctrl+f":
 			curr := &m.tasks[m.cursor]
@@ -87,7 +85,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				curr.done = true
 			}
 		case "ctrl+d":
-			m.tasks = append(m.tasks[0:m.cursor], m.tasks[m.cursor+1:]...)
+			m.RemoveTask()
+
+		case "ctrl+shift+d":
+			m.tasks = []task{}
+			m.cursor = 0
 		case "enter":
 			newTask := m.newTask.Value()
 			m.newTask.SetValue("")
