@@ -28,3 +28,21 @@ func (m *Model) RemoveTask() {
 	}
 	m.tasks = append(m.tasks[0:curr], m.tasks[curr+1:]...)
 }
+
+func (m *Model) ToggleDone() {
+	curr := &m.tasks[m.cursor]
+	if curr.done {
+		curr.done = false
+	} else {
+		curr.done = true
+	}
+}
+
+func (m *Model) AddTask() {
+	newTask := m.newTask.Value()
+	if newTask != "" {
+		m.tasks = append(m.tasks, task{title: newTask})
+		m.newTask.SetValue("")
+		m.adding = false
+	}
+}

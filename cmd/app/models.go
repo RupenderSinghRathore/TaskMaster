@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -22,29 +23,46 @@ func (m Model) View() string {
 	if m.width == 0 {
 		return "loading..."
 	}
-	FTask := []string{"Task Master -->"}
+	title := "ToDo deez nuts.."
+	// FTask := []string{"Task Master -->"}
+	tasks := ""
 	for i, t := range m.tasks {
+		if t.title == "" {
+			continue
+		}
 		cursor := " "
 		if i == m.cursor {
 			cursor = ">"
 		}
 		done := ""
 		if t.done {
-			// done = "o(≧▽≦)o"
 			done = "🔥o(≧▽≦)o🔥"
 		}
-		FTask = append(FTask, fmt.Sprintf("%s [%s] %s", cursor, t.title, done))
+		index := strconv.Itoa(i + 1)
+		tasks += fmt.Sprintf(
+			"%s %s %s %s\n",
+			m.styles.TasksColor.Render(index),
+			m.styles.CursorStyle.Render(cursor),
+			m.styles.TasksColor.Render(t.title),
+			m.styles.CursorStyle.Render(done))
 	}
-	FTask = append(FTask, m.styles.InputField.Render(m.newTask.View()))
+	title = m.styles.TitleField.Render(title)
+	tasks = m.styles.TasksField.Render(tasks)
+	input := ""
+	if m.adding {
+		input = m.styles.InputField.Render(m.newTask.View())
+	}
 
 	return lipgloss.Place(
 		m.width,
-		m.height/2,
-		lipgloss.Top,
-		lipgloss.Top,
+		m.height,
+		lipgloss.Center,
+		lipgloss.Center,
 		lipgloss.JoinVertical(
 			lipgloss.Left,
-			FTask...,
+			title,
+			tasks,
+			input,
 		),
 	)
 }
@@ -58,42 +76,47 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 
-		// case "a":
-		// 	m.adding = true
-		case "ctrl+c", "q":
+		case "ctrl+c":
 			m.WriteToFile()
 			return m, tea.Quit
-		case "down":
-			if m.cursor < len(m.tasks)-1 {
+		case "q":
+			if !m.adding {
+				m.WriteToFile()
+				return m, tea.Quit
+			}
+
+		case "n", "down":
+			if !m.adding && m.cursor < len(m.tasks)-1 {
 				m.cursor++
 			}
-		case "up":
-			if m.cursor > 0 {
+		case "e", "up":
+			if !m.adding && m.cursor > 0 {
 				m.cursor--
 			}
-
-		case "ctrl+up":
-			m.ToggleUp()
-		case "ctrl+down":
+		case "ctrl+n", "ctrl+down":
 			m.ToggleDown()
+		case "ctrl+e", "ctrl+up":
+			m.ToggleUp()
 
-		case "ctrl+f":
-			curr := &m.tasks[m.cursor]
-			if curr.done {
-				curr.done = false
+		case "ctrl+a":
+			m.adding = true
+			m.newTask.SetValue("")
+		case "enter":
+			if m.adding {
+				m.AddTask()
 			} else {
-				curr.done = true
+				m.ToggleDone()
 			}
-		case "ctrl+d":
-			m.RemoveTask()
+		case "esc":
+			m.adding = false
 
-		case "ctrl+shift+d":
+		case "d":
+			if !m.adding {
+				m.RemoveTask()
+			}
+		case "alt+r":
 			m.tasks = []task{}
 			m.cursor = 0
-		case "enter":
-			newTask := m.newTask.Value()
-			m.newTask.SetValue("")
-			m.tasks = append(m.tasks, task{title: newTask})
 		}
 	case tea.WindowSizeMsg:
 		m.width = msg.Width

@@ -3,14 +3,35 @@ package main
 import "github.com/charmbracelet/lipgloss"
 
 type Styles struct {
-	BorderColor lipgloss.Color
+	TitleField  lipgloss.Style
 	TasksField  lipgloss.Style
+	TasksColor  lipgloss.Style
 	InputField  lipgloss.Style
+	CursorStyle lipgloss.Style
 }
 
 func DefaultStyle() *Styles {
 	s := &Styles{}
-	s.BorderColor = lipgloss.Color("#09c2e3")
-	s.InputField = lipgloss.NewStyle().BorderForeground(s.BorderColor).BorderStyle(lipgloss.NormalBorder()).Padding(1).Width(80)
+
+	s.CursorStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#ff0000"))
+	s.TasksColor = lipgloss.NewStyle().Foreground(lipgloss.Color("#82aaff"))
+	s.TitleField = lipgloss.NewStyle().
+		Padding(1).
+		Bold(true).
+		Foreground(lipgloss.Color("#c792ea")) // Soft lavender-purple (editor theme vibe)
+
+	s.TasksField = lipgloss.NewStyle().
+		Padding(1).
+		Bold(true).
+		Width(70)
+
+	s.InputField = lipgloss.NewStyle().
+		BorderForeground(lipgloss.Color("#165e7a")).
+		BorderStyle(lipgloss.NormalBorder()).
+		Padding(1).
+		Width(70).
+		Foreground(lipgloss.Color("#00dddd")).
+		UnsetBlink().
+		Blink(false)
 	return s
 }
