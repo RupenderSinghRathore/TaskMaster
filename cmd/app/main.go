@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"os"
+
+	"github.com/RupenderSinghRathore/TaskMaster/internal/models"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"os"
 )
 
 func main() {
@@ -19,7 +21,7 @@ func main() {
 func initialModel() Model {
 	m := Model{
 		newTask: textinput.New(),
-		styles:  DefaultStyle(),
+		styles:  models.DefaultStyle(),
 	}
 	m.ReadFromFile()
 	m.newTask.Width = 100

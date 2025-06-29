@@ -1,6 +1,8 @@
-package main
+package models
 
-import "github.com/charmbracelet/lipgloss"
+import (
+	"github.com/charmbracelet/lipgloss"
+)
 
 type Styles struct {
 	TitleField  lipgloss.Style

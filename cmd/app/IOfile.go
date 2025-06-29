@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"os"
 	"strings"
+
+	"github.com/RupenderSinghRathore/TaskMaster/internal/models"
 )
 
 func (m Model) WriteToFile() error {
@@ -18,10 +20,10 @@ func (m Model) WriteToFile() error {
 	}
 	defer f.Close()
 	for _, task := range m.tasks {
-		if task.done {
+		if task.Done {
 			continue
 		}
-		_, err := f.Write([]byte(task.title + "\n"))
+		_, err := f.Write([]byte(task.Title + "\n"))
 		if err != nil {
 			return err
 		}
@@ -41,7 +43,7 @@ func (m *Model) ReadFromFile() error {
 		line := scanner.Text()
 		line = strings.TrimSpace(line)
 		if line != "" {
-			m.tasks = append(m.tasks, task{title: line})
+			m.tasks = append(m.tasks, models.Task{Title: line})
 		}
 	}
 	if err = scanner.Err(); err != nil {

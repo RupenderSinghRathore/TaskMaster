@@ -4,16 +4,17 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/RupenderSinghRathore/TaskMaster/internal/models"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
 type Model struct {
-	tasks   []task
+	tasks   []models.Task
 	cursor  int
 	newTask textinput.Model
-	styles  *Styles
+	styles  *models.Styles
 	adding  bool
 	width   int
 	height  int
@@ -24,10 +25,9 @@ func (m Model) View() string {
 		return "loading..."
 	}
 	title := "ToDo deez nuts.."
-	// FTask := []string{"Task Master -->"}
 	tasks := ""
 	for i, t := range m.tasks {
-		if t.title == "" {
+		if t.Title == "" {
 			continue
 		}
 		cursor := " "
@@ -35,7 +35,7 @@ func (m Model) View() string {
 			cursor = ">"
 		}
 		done := ""
-		if t.done {
+		if t.Done {
 			done = "🔥o(≧▽≦)o🔥"
 		}
 		index := strconv.Itoa(i + 1)
@@ -43,7 +43,7 @@ func (m Model) View() string {
 			"%s %s %s %s\n",
 			m.styles.TasksColor.Render(index),
 			m.styles.CursorStyle.Render(cursor),
-			m.styles.TasksColor.Render(t.title),
+			m.styles.TasksColor.Render(t.Title),
 			m.styles.CursorStyle.Render(done))
 	}
 	title = m.styles.TitleField.Render(title)
@@ -115,7 +115,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.RemoveTask()
 			}
 		case "alt+r":
-			m.tasks = []task{}
+			m.tasks = []models.Task{}
 			m.cursor = 0
 		}
 	case tea.WindowSizeMsg:

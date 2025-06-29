@@ -3,6 +3,8 @@ package main
 import (
 	"strings"
 	"unicode"
+
+	"github.com/RupenderSinghRathore/TaskMaster/internal/models"
 )
 
 func (m *Model) ToggleUp() {
@@ -36,10 +38,10 @@ func (m *Model) RemoveTask() {
 
 func (m *Model) ToggleDone() {
 	curr := &m.tasks[m.cursor]
-	if curr.done {
-		curr.done = false
+	if curr.Done {
+		curr.Done = false
 	} else {
-		curr.done = true
+		curr.Done = true
 	}
 }
 
@@ -48,7 +50,7 @@ func (m *Model) AddTask() {
 	newTask = strings.TrimSpace(newTask)
 	newTask = Title(newTask)
 	if newTask != "" {
-		m.tasks = append(m.tasks, task{title: newTask})
+		m.tasks = append(m.tasks, models.Task{Title: newTask})
 		m.newTask.SetValue("")
 		m.adding = false
 	}
