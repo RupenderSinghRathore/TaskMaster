@@ -52,18 +52,19 @@ func (m Model) View() string {
 	if m.adding {
 		input = m.styles.InputField.Render(m.newTask.View())
 	}
+	content := lipgloss.JoinVertical(
+		lipgloss.Left,
+		title,
+		tasks,
+		input,
+	)
 
 	return lipgloss.Place(
 		m.width,
 		m.height,
 		lipgloss.Center,
-		lipgloss.Center,
-		lipgloss.JoinVertical(
-			lipgloss.Left,
-			title,
-			tasks,
-			input,
-		),
+		lipgloss.Top,
+		content,
 	)
 }
 func (m Model) Init() tea.Cmd {

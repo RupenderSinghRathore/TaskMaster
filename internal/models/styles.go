@@ -18,14 +18,14 @@ func DefaultStyle() *Styles {
 	s.CursorStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#ff0000"))
 	s.TasksColor = lipgloss.NewStyle().Foreground(lipgloss.Color("#82aaff"))
 	s.TitleField = lipgloss.NewStyle().
-		Padding(1).
+		Padding(4, 1, 1, 1).
 		Bold(true).
-		Foreground(lipgloss.Color("#c792ea")) // Soft lavender-purple (editor theme vibe)
+		Foreground(lipgloss.Color("#c792ea")).Width(71)
 
 	s.TasksField = lipgloss.NewStyle().
 		Padding(1).
 		Bold(true).
-		Width(70)
+		Width(71)
 
 	s.InputField = lipgloss.NewStyle().
 		BorderForeground(lipgloss.Color("#165e7a")).
