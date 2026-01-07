@@ -39,7 +39,7 @@ func loadTasks() (models.Tasks, error) {
 			Title:       record[0],
 			Description: record[1],
 			Status:      models.Status(status),
-			Deadline:    deadline,
+			Deadline:    &deadline,
 		})
 	}
 	return tasks, nil
@@ -60,6 +60,5 @@ func saveTasks(tasks models.Tasks) error {
 			task.Deadline.Format(time.DateTime),
 		})
 	}
-	writer := csv.NewWriter(f)
-	return writer.WriteAll(records)
+	return csv.NewWriter(f).WriteAll(records)
 }

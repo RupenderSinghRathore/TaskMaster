@@ -6,18 +6,18 @@ import (
 
 type Tasks []*Task
 type Task struct {
-	Title       string    `csv:"Title"`
-	Description string    `csv:"Description"`
-	Status      Status    `csv:"Status"`
-	Deadline    time.Time `csv:"Deadline"`
+	Title       string
+	Description string
+	Status      Status
+	Deadline    *time.Time
 }
 
-func (t *Tasks) Append(title string, deadline time.Time) {
+func (t *Tasks) Append(title string) *Task {
 	task := &Task{
-		Title:    title,
-		Deadline: deadline,
+		Title: title,
 	}
 	*t = append(*t, task)
+	return task
 }
 func (t *Tasks) Delete(ids []int) {
 	newTasks := Tasks{}

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"text/tabwriter"
-	"time"
 )
 
 type application struct {
@@ -19,16 +18,15 @@ func main() {
 	if err != nil {
 		fmt.Printf("err: %s\n", err.Error())
 	}
-	args := os.Args[1:]
 	writer := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.DiscardEmptyColumns)
 	app := application{
 		tasks:  tasks,
-		args:   args,
+		args:   os.Args[1:],
 		writer: writer,
 	}
-	app.tasks.Append("fuck you", time.Now())
-	app.tasks[0].Status = models.Done
-	app.tasks.Append("make some sense", time.Now())
+	// app.tasks.Append("fuck you")
+	// app.tasks[0].Status = models.Done
+	// app.tasks.Append("make some sense")
 	app.handleArgs()
 	if err := saveTasks(app.tasks); err != nil {
 		fmt.Printf("err: %s\n", err.Error())
