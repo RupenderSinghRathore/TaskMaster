@@ -19,11 +19,21 @@ func (t *Tasks) Append(title string) *Task {
 	*t = append(*t, task)
 	return task
 }
-func (t *Tasks) Delete(ids []int) {
+func (t *Tasks) Delete(ids map[int]bool) {
 	newTasks := Tasks{}
-	id := ids[0]
 	for j, task := range *t {
-		if j != id-1 {
+		if _, ok := ids[j]; !ok {
+			newTasks = append(newTasks, task)
+		}
+		(*t)[j] = nil
+	}
+	*t = newTasks
+}
+
+func (t *Tasks) Purge() {
+	newTasks := Tasks{}
+	for j, task := range *t {
+		if task.Status != Done {
 			newTasks = append(newTasks, task)
 		}
 		(*t)[j] = nil

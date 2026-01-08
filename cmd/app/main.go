@@ -16,7 +16,7 @@ type application struct {
 func main() {
 	tasks, err := loadTasks()
 	if err != nil {
-		fmt.Printf("err: %s\n", err.Error())
+		fmt.Fprintf(os.Stderr, "err: %s\n", err.Error())
 	}
 	writer := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.DiscardEmptyColumns)
 	app := application{
@@ -24,11 +24,8 @@ func main() {
 		args:   os.Args[1:],
 		writer: writer,
 	}
-	// app.tasks.Append("fuck you")
-	// app.tasks[0].Status = models.Done
-	// app.tasks.Append("make some sense")
 	app.handleArgs()
 	if err := saveTasks(app.tasks); err != nil {
-		fmt.Printf("err: %s\n", err.Error())
+		fmt.Fprintf(os.Stderr, "err: %s\n", err.Error())
 	}
 }
