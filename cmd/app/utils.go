@@ -10,6 +10,15 @@ import (
 )
 
 func (app *application) log() {
+	defer func() {
+		if err := app.writer.Flush(); err != nil {
+			fmt.Fprintf(os.Stderr, "err: %s\n", err.Error())
+		}
+	}()
+	if len(app.tasks) == 0 {
+		fmt.Fprint(app.writer, "Your logs are empty..\n")
+		return
+	}
 	var isDone string
 	detailed := len(app.args) > 1 && app.args[1] == "-d" ||
 		(len(app.args) > 2 && app.args[2] == "-d")
@@ -52,9 +61,6 @@ func (app *application) log() {
 			}
 			fmt.Fprintf(app.writer, "    %d >\t%s\t%s\n", i+1, task.Title, isDone)
 		}
-	}
-	if err := app.writer.Flush(); err != nil {
-		fmt.Fprintf(os.Stderr, "err: %s", err.Error())
 	}
 }
 func (app *application) undo() (string, error) {

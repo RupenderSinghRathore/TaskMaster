@@ -14,7 +14,7 @@ import (
 	"golang.org/x/term"
 )
 
-const FILE = ".tasks.csv"
+const FILE = "/home/kami-sama/.tasks.csv"
 
 func (app *application) interactiveShellMode() error {
 	oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
@@ -51,7 +51,9 @@ func (app *application) interactiveShellMode() error {
 			if err != nil {
 				terminal.Write(append([]byte(err.Error()), '\n'))
 			}
-			terminal.Write(append([]byte(msg), '\n'))
+			if len(msg) != 0 {
+				terminal.Write(append([]byte(msg), '\n'))
+			}
 		}
 	}
 	return nil
