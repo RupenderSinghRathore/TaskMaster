@@ -4,6 +4,7 @@ import (
 	"RupenderSinghRathore/TaskMaster/internal/models"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 	"time"
@@ -230,6 +231,36 @@ func (app *application) swap() (string, error) {
 func (app *application) purge() string {
 	app.tasks.Purge()
 	return "All tasks purged.."
+}
+
+func (app *application) help() {
+	helpMsg := `Usage of %s:
+	  -log
+			Prints the tasks
+	  -add strings..
+			Adds a task
+	  -rm [idxs..]
+			Removes the tasks
+	  -done [idxs..]
+			Marks the tasks completed
+	  -undo [idxs..]
+			Marks the tasks uncompleted
+	  -edit [idx] [new_title]
+			Edit the title of the specified task
+	  -swap [idx_1] [idx_2]
+			Swaps the positions of the specified tasks
+	  -purge
+			Clear completed tasks
+	  -clear
+			Clear all tasks
+`
+	var writer io.Writer
+	if app.isInteractive {
+		writer = app.terminal
+	} else {
+		writer = os.Stdout
+	}
+	fmt.Fprintf(writer, helpMsg, os.Args[0])
 }
 
 const (
