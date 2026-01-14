@@ -15,7 +15,6 @@ type application struct {
 	writer        *tabwriter.Writer
 	isInteractive bool
 	terminal      *term.Terminal
-	isLog         bool
 }
 
 func main() {
@@ -27,7 +26,6 @@ func main() {
 		tasks:         tasks,
 		args:          os.Args[1:],
 		isInteractive: len(os.Args) == 1,
-		isLog:         true,
 	}
 	if err := app.handleModes(); err != nil {
 		handleErr(err)
@@ -51,9 +49,6 @@ func (app *application) handleModes() error {
 		if len(msg) != 0 {
 			fmt.Printf("\n%s\n", msg)
 		}
-		if app.isLog {
-			app.log()
-		}
 	}
 	return nil
 }
@@ -62,9 +57,7 @@ func (app *application) handleArgs() (string, error) {
 	var msg string
 	switch app.args[0] {
 	case "log":
-		if app.isInteractive {
-			app.log()
-		}
+		app.log()
 	case "add":
 		msg, err = app.add()
 	case "rm":
@@ -76,16 +69,15 @@ func (app *application) handleArgs() (string, error) {
 	case "swap":
 		msg, err = app.swap()
 	case "purge":
-		app.purge()
+		msg = app.purge()
 	case "clear":
-		app.clear()
+		msg = app.clear()
 	case "edit":
 		msg, err = app.edit()
 	case "help":
 		app.help()
-		app.isLog = false
 	default:
-		return "", fmt.Errorf("%s is not a valid option", app.args[0])
+		return "", fmt.Errorf("%s is not a valid option, try help command", app.args[0])
 	}
 	return msg, err
 }

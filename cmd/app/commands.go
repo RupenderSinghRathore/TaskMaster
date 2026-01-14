@@ -163,9 +163,9 @@ func (app *application) done() (string, error) {
 	}
 	var msg string
 	if count > 1 {
-		msg = "Tasks removed from your log.."
+		msg = "Tasks marked done.."
 	} else {
-		msg = "Task removed from your log.."
+		msg = "Task marked done.."
 	}
 	return msg, nil
 }
@@ -240,18 +240,21 @@ func (app *application) purge() string {
 
 func (app *application) help() {
 	helpMsg := `Usage of %s:
-	  -log
+	  -log [options]
 			Prints the tasks
-	  -add strings..
+			options: -d(detailed), -l(long-term)
+	  -add strings.. [options]
 			Adds a task
+			options: -desc(add description), -time(time-period)
 	  -rm [idxs..]
 			Removes the tasks
 	  -done [idxs..]
 			Marks the tasks completed
 	  -undo [idxs..]
 			Marks the tasks uncompleted
-	  -edit [idx] [new_title]
+	  -edit [idx] [new_title] [options]
 			Edit the title of the specified task
+			options: -desc(add description), -time(time-period)
 	  -swap [idx_1] [idx_2]
 			Swaps the positions of the specified tasks
 	  -purge

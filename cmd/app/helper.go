@@ -13,50 +13,49 @@ const (
 )
 
 func getDeadline(period string) (*time.Time, error) {
-	count, err := strconv.Atoi(period[:len(period)-1])
+	count, err := strconv.ParseFloat(period[:len(period)-1], 64)
 	if err != nil {
 		return nil, fmt.Errorf("Wrong format for time in %s\n", period)
 	}
-	durationHours := count
 	switch period[len(period)-1] {
 	case 'd':
-		durationHours *= Day
+		count *= Day
 	case 'w':
-		durationHours *= Day * 7
+		count *= Day * 7
 	case 'm':
-		durationHours *= Day * 30
+		count *= Day * 30
 	case 'y':
 		{
 			if count > 100 {
 				return nil, errors.New("MotherFucker you'd be dead by then.\n")
 			}
-			durationHours *= Day * 365
+			count *= Day * 365
 		}
 	}
-	durationNeno := durationHours * int(time.Hour)
+	durationNeno := count * float64(time.Hour)
 	deadline := time.Now().Add(time.Duration(durationNeno))
 	return &deadline, nil
 }
 func getTimeperiod(t *time.Time) string {
 	rawDuration := time.Until(*t)
-	hours := int(rawDuration.Hours())
+	hours := rawDuration.Hours()
 
 	var period string
 	switch {
 	case hours < 0:
 		period = "💀"
 	case hours/(Day*365) >= 1:
-		period = strconv.Itoa(hours/(Day*365)) + "y"
+		period += strconv.FormatFloat(hours/(Day*365), 'f', 1, 64) + "y"
 	case hours/(Day*30) >= 1:
-		period = strconv.Itoa(hours/(Day*30)) + "m"
+		period += strconv.FormatFloat(hours/(Day*30), 'f', 1, 64) + "m"
 	case hours/(Day*7) >= 1:
-		period = strconv.Itoa(hours/(Day*7)) + "w"
+		period += strconv.FormatFloat(hours/(Day*7), 'f', 1, 64) + "w"
 	case hours/Day >= 1:
-		period = strconv.Itoa(hours/Day) + "d"
+		period += strconv.FormatFloat(hours/Day, 'f', 1, 64) + "d"
 	case hours >= 1:
-		period = strconv.Itoa(hours) + "h"
+		period += strconv.FormatFloat(hours, 'f', 1, 64) + "h"
 	default:
-		period = strconv.Itoa(int(rawDuration.Minutes())) + "min"
+		period += strconv.FormatFloat(rawDuration.Minutes(), 'f', 0, 64) + "min"
 	}
 	return period
 }
