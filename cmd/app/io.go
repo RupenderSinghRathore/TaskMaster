@@ -16,7 +16,12 @@ import (
 
 const FILE = "/home/kami-sama/.tasks.csv"
 
-func (app *application) interactiveShellMode() error {
+func (app *application) shellMode() error {
+	w, h, err := term.GetSize(int(os.Stdout.Fd()))
+	if err != nil {
+		return err
+	}
+
 	oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
 	if err != nil {
 		panic(err)
@@ -24,6 +29,11 @@ func (app *application) interactiveShellMode() error {
 	defer term.Restore(int(os.Stdin.Fd()), oldState)
 
 	terminal := term.NewTerminal(os.Stdout, "> ")
+
+	if err := terminal.SetSize(w, h); err != nil {
+		return err
+	}
+
 	app.terminal = terminal
 	app.writer = tabwriter.NewWriter(
 		terminal,

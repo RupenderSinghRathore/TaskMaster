@@ -37,7 +37,7 @@ func main() {
 
 func (app *application) handleModes() error {
 	if app.isInteractive {
-		if err := app.interactiveShellMode(); err != nil {
+		if err := app.shellMode(); err != nil {
 			return err
 		}
 	} else {
