@@ -4,6 +4,7 @@ import (
 	"RupenderSinghRathore/TaskMaster/internal/models"
 	"encoding/csv"
 	"errors"
+	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -46,7 +47,12 @@ func (app *application) shellMode() error {
 	for {
 		line, err := terminal.ReadLine()
 		if err != nil {
-			return err
+			switch {
+			case errors.Is(err, io.EOF):
+				return nil
+			default:
+				return err
+			}
 		}
 		if trimedLine := strings.TrimSpace(line); trimedLine != "" {
 			if trimedLine == "exit" {

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"runtime/debug"
 	"strconv"
 	"time"
 )
@@ -80,5 +81,6 @@ func getInt(s string, tasklen int) (int, error) {
 }
 func handleErr(err error) {
 	fmt.Fprintf(os.Stderr, "err: %v\n", err)
+	fmt.Fprintf(os.Stdout, "trace: %s\n", string(debug.Stack()))
 	os.Exit(1)
 }
