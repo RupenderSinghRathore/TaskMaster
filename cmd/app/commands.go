@@ -113,6 +113,9 @@ func (app *application) add() (string, error) {
 				if err != nil {
 					return "", err
 				}
+				if task.Description == "" && time.Until(*task.Deadline) > 24 * time.Hour {
+					task.Description = "Long term task"
+				}
 				i++
 			} else {
 				return "", errors.New("Empty Time")
