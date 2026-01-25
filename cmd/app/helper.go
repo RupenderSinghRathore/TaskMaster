@@ -1,6 +1,7 @@
 package main
 
 import (
+	"RupenderSinghRathore/TaskMaster/internal/models"
 	"errors"
 	"fmt"
 	"os"
@@ -12,10 +13,10 @@ const (
 	Day = 24
 )
 
-func getDeadline(period string) (*time.Time, error) {
+func getDeadline(period string) (time.Time, error) {
 	count, err := strconv.ParseFloat(period[:len(period)-1], 64)
 	if err != nil {
-		return nil, fmt.Errorf("Wrong format for time in %s\n", period)
+		return time.Time{}, fmt.Errorf("Wrong format for time in %s\n", period)
 	}
 	switch period[len(period)-1] {
 	case 'd':
@@ -27,17 +28,17 @@ func getDeadline(period string) (*time.Time, error) {
 	case 'y':
 		{
 			if count > 100 {
-				return nil, errors.New("MotherFucker you'd be dead by then.\n")
+				return time.Time{}, errors.New("MotherFucker you'd be dead by then.\n")
 			}
 			count *= Day * 365
 		}
 	}
 	durationNeno := count * float64(time.Hour)
 	deadline := time.Now().Add(time.Duration(durationNeno))
-	return &deadline, nil
+	return deadline, nil
 }
-func getTimeperiod(t *time.Time) string {
-	rawDuration := time.Until(*t)
+func getTimeperiod(t time.Time) string {
+	rawDuration := time.Until(t)
 	hours := rawDuration.Hours()
 
 	var period string
@@ -82,4 +83,17 @@ func handleErr(err error) {
 	fmt.Fprintf(os.Stderr, "err: %v\n", err)
 	// fmt.Fprintf(os.Stdout, "trace: %s\n", string(debug.Stack()))
 	os.Exit(1)
+}
+
+func insertionSort(tasks models.Tasks) {
+	var  j int
+	for i, task := range tasks {
+		curr := time.Until(task.Deadline)
+		j = i-1
+		for j >= 0 && time.Until(tasks[j].Deadline) > curr {
+			tasks[j+1] = tasks[j]
+			j--
+		}
+		tasks[j+1] = task
+	}
 }

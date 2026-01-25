@@ -44,7 +44,7 @@ func (app *application) log() {
 	}
 	var isDone string
 	for i, task := range app.tasks {
-		isShortTerm := time.Until(*task.Deadline) < 24*time.Hour
+		isShortTerm := time.Until(task.Deadline) < 24*time.Hour
 		if longTerm && isShortTerm {
 			continue
 		}
@@ -113,7 +113,7 @@ func (app *application) add() (string, error) {
 				if err != nil {
 					return "", err
 				}
-				if task.Description == "" && time.Until(*task.Deadline) > 24 * time.Hour {
+				if task.Description == "" && time.Until(task.Deadline) > 24 * time.Hour {
 					task.Description = "Long term task"
 				}
 				i++
@@ -123,7 +123,7 @@ func (app *application) add() (string, error) {
 			i++
 		} else {
 			t := time.Now().Add(time.Hour * 24)
-			task.Deadline = &t
+			task.Deadline = t
 		}
 	}
 	var msg string

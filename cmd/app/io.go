@@ -4,76 +4,13 @@ import (
 	"RupenderSinghRathore/TaskMaster/internal/models"
 	"encoding/csv"
 	"errors"
-	"io"
 	"os"
 	"strconv"
-	"strings"
-	"text/tabwriter"
 	"time"
-
-	"github.com/google/shlex"
-	"golang.org/x/term"
 )
 
 const FILE = "/home/kami-sama/.tasks.csv"
 
-func (app *application) shellMode() error {
-	w, h, err := term.GetSize(int(os.Stdout.Fd()))
-	if err != nil {
-		return err
-	}
-
-	oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
-	if err != nil {
-		panic(err)
-	}
-	defer term.Restore(int(os.Stdin.Fd()), oldState)
-
-	terminal := term.NewTerminal(os.Stdout, "> ")
-
-	if err := terminal.SetSize(w, h); err != nil {
-		return err
-	}
-
-	app.terminal = terminal
-	app.writer = tabwriter.NewWriter(
-		terminal,
-		0,
-		0,
-		2,
-		' ',
-		tabwriter.DiscardEmptyColumns,
-	)
-	for {
-		line, err := terminal.ReadLine()
-		if err != nil {
-			switch {
-			case errors.Is(err, io.EOF):
-				return nil
-			default:
-				return err
-			}
-		}
-		if trimedLine := strings.TrimSpace(line); trimedLine != "" {
-			if trimedLine == "exit" {
-				terminal.Write([]byte("bye..\n"))
-				break
-			}
-			app.args, err = shlex.Split(trimedLine)
-			if err != nil {
-				terminal.Write(append([]byte(err.Error()), '\n'))
-			}
-			msg, err := app.handleArgs()
-			if err != nil {
-				terminal.Write(append([]byte(err.Error()), '\n'))
-			}
-			if len(msg) != 0 {
-				terminal.Write(append([]byte(msg), '\n'))
-			}
-		}
-	}
-	return nil
-}
 func loadTasks() (models.Tasks, error) {
 
 	tasks := models.Tasks{}
@@ -104,7 +41,7 @@ func loadTasks() (models.Tasks, error) {
 			Title:       record[0],
 			Description: record[1],
 			Status:      models.Status(status),
-			Deadline:    &deadline,
+			Deadline:    deadline,
 		})
 	}
 	return tasks, nil

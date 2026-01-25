@@ -9,7 +9,7 @@ type Task struct {
 	Title       string
 	Description string
 	Status      Status
-	Deadline    *time.Time
+	Deadline    time.Time
 }
 
 func (t *Tasks) Append(title string) *Task {

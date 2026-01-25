@@ -22,6 +22,7 @@ func main() {
 	if err != nil {
 		handleErr(err)
 	}
+	insertionSort(tasks)
 	app := application{
 		tasks:         tasks,
 		args:          os.Args[1:],
