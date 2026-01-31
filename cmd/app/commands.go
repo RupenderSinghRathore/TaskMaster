@@ -150,6 +150,7 @@ func (app *application) add() (string, error) {
 	}
 
 	app.tasks.AppendTasks(tasks)
+	insertionSort(app.tasks)
 
 	msg := "Task added to your log.."
 	if len(tasks) > 1 {
@@ -223,7 +224,7 @@ func (app *application) edit() (string, error) {
 	editCmd.Parse(app.args[2:])
 
 	if *title != "" {
-		task.Title = *title
+		task.Title = capitalize(*title)
 	}
 	if *desc != "" {
 		task.Description = *desc
@@ -233,6 +234,7 @@ func (app *application) edit() (string, error) {
 		if err != nil {
 			return "", fmt.Errorf("%s is not a valid time", *time)
 		}
+		insertionSort(app.tasks)
 	}
 	if *status != "" {
 		err := task.Status.UpdateStatus(*status)
