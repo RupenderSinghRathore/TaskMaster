@@ -70,14 +70,14 @@ func notValidId(id int) error {
 	return fmt.Errorf("%d is not a valid task\n", id)
 
 }
-func getInt(s string, tasklen int) (int, error) {
+func getTaskId(s string, tasklen int) (int, error) {
 	id, err := strconv.Atoi(s)
 	if err != nil {
 		return 0, err
 	} else if id < 1 || id > tasklen {
 		return 0, notValidId(id)
 	}
-	return id, nil
+	return id - 1, nil
 }
 func handleErr(err error) {
 	fmt.Fprintf(os.Stderr, "err: %v\n", err)
@@ -86,14 +86,23 @@ func handleErr(err error) {
 }
 
 func insertionSort(tasks models.Tasks) {
-	var  j int
+	var j int
 	for i, task := range tasks {
 		curr := time.Until(task.Deadline)
-		j = i-1
+		j = i - 1
 		for j >= 0 && time.Until(tasks[j].Deadline) > curr {
 			tasks[j+1] = tasks[j]
 			j--
 		}
 		tasks[j+1] = task
 	}
+}
+func validateTitle(title string) error {
+	switch {
+	case title == "":
+		return errors.New("empty title")
+	case title[0] == '-':
+		return errors.New("invalid character in title")
+	}
+	return nil
 }

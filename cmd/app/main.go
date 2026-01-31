@@ -22,15 +22,18 @@ func main() {
 	if err != nil {
 		handleErr(err)
 	}
+
 	insertionSort(tasks)
 	app := application{
 		tasks:         tasks,
 		args:          os.Args[1:],
 		isInteractive: len(os.Args) == 1,
 	}
+
 	if err := app.handleModes(); err != nil {
 		handleErr(err)
 	}
+
 	if err := saveTasks(app.tasks); err != nil {
 		handleErr(err)
 	}

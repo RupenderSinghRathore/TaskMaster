@@ -15,9 +15,14 @@ type Task struct {
 func (t *Tasks) Append(title string) *Task {
 	task := &Task{
 		Title: title,
+		Deadline: time.Now().Add(24*time.Hour),
+		Status: Pending,
 	}
 	*t = append(*t, task)
 	return task
+}
+func (t *Tasks) AppendTasks(tasks Tasks) {
+	*t = append(*t, tasks...)
 }
 func (t *Tasks) Delete(ids map[int]bool) {
 	newTasks := Tasks{}

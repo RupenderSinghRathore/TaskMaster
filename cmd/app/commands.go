@@ -3,11 +3,14 @@ package main
 import (
 	"RupenderSinghRathore/TaskMaster/internal/models"
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	"os"
 	"time"
 )
+
+var ErrNotEnoughArgs = errors.New("not enough args")
 
 func (app *application) log() {
 	defer func() {
@@ -72,11 +75,10 @@ func (app *application) log() {
 func (app *application) undo() (string, error) {
 	count := 0
 	for _, id := range app.args[1:] {
-		idx, err := getInt(id, len(app.tasks))
+		idx, err := getTaskId(id, len(app.tasks))
 		if err != nil {
 			return "", err
 		}
-		idx--
 		if app.tasks[idx].Status == models.Done {
 			app.tasks[idx].Status = models.Pending
 		}
@@ -93,56 +95,79 @@ func (app *application) undo() (string, error) {
 }
 func (app *application) add() (string, error) {
 	n := len(app.args)
+	if n < 2 {
+		return "", ErrNotEnoughArgs
+	}
+
 	var err error
-	count := 0
-	for i := 1; i < n; i++ {
-		task := app.tasks.Append(capitalize(app.args[i]))
-		count++
-		if i+1 < n && app.args[i+1] == "-desc" {
-			if i+2 < n {
-				task.Description = app.args[i+2]
-				i++
-			} else {
-				return "", errors.New("Empty Description")
-			}
-			i++
+	tasks := models.Tasks{}
+
+	addCmd := flag.NewFlagSet("add", flag.PanicOnError)
+
+	desc := addCmd.String("desc", "", "new description")
+	deadline := addCmd.String("time", "", "new deadline")
+	status := addCmd.String("status", "", "new status")
+
+	for i := 1; i < n; {
+		*desc = ""
+		*deadline = ""
+		*status = ""
+
+		title := app.args[i]
+		if err := validateTitle(title); err != nil {
+			return "", err
 		}
-		if i+1 < n && app.args[i+1] == "-time" {
-			if i+2 < n {
-				task.Deadline, err = getDeadline(app.args[i+2])
-				if err != nil {
-					return "", err
-				}
-				if task.Description == "" && time.Until(task.Deadline) > 24 * time.Hour {
-					task.Description = "Long term task"
-				}
-				i++
-			} else {
-				return "", errors.New("Empty Time")
-			}
-			i++
-		} else {
-			t := time.Now().Add(time.Hour * 24)
-			task.Deadline = t
+
+		task := tasks.Append(capitalize(title))
+		i++
+
+		if i == n {
+			break
 		}
+
+		addCmd.Parse(app.args[i:])
+
+		if *desc != "" {
+			task.Description = *desc
+		}
+		if *deadline != "" {
+			task.Deadline, err = getDeadline(*deadline)
+			if err != nil {
+				return "", fmt.Errorf("%s is not a valid time", *deadline)
+			}
+			if task.Description == "" && time.Until(task.Deadline) > 24*time.Hour {
+				task.Description = "Long term task"
+			}
+		}
+		if *status != "" {
+			err := task.Status.UpdateStatus(*status)
+			if err != nil {
+				return "", err
+			}
+		}
+
+		i += len(app.args[i:]) - addCmd.NArg()
 	}
-	var msg string
-	if count > 1 {
+
+	app.tasks.AppendTasks(tasks)
+
+	msg := "Task added to your log.."
+	if len(tasks) > 1 {
 		msg = "Tasks added to your log.."
-	} else {
-		msg = "Task added to your log.."
 	}
+
 	return msg, nil
 }
+
 func (app *application) remove() (string, error) {
 	ids := make(map[int]bool, len(app.args[1:]))
 	count := 0
 	for _, id := range app.args[1:] {
-		i, err := getInt(id, len(app.tasks))
+		i, err := getTaskId(id, len(app.tasks))
 		if err != nil {
 			return "", err
 		}
-		ids[i-1] = true
+		ids[i] = true
 		count++
 	}
 	app.tasks.Delete(ids)
@@ -157,11 +182,11 @@ func (app *application) remove() (string, error) {
 func (app *application) done() (string, error) {
 	count := 0
 	for _, id := range app.args[1:] {
-		idx, err := getInt(id, len(app.tasks))
+		idx, err := getTaskId(id, len(app.tasks))
 		if err != nil {
 			return "", err
 		}
-		app.tasks[idx-1].Status = models.Done
+		app.tasks[idx].Status = models.Done
 		count++
 	}
 	var msg string
@@ -177,61 +202,59 @@ func (app *application) clear() string {
 	return "All your logs are cleared.."
 }
 func (app *application) edit() (string, error) {
-	n := len(app.args)
-	if n > 2 && n < 8 {
-		id, err := getInt(app.args[1], len(app.tasks))
+	if len(app.args) < 3 {
+		return "", ErrNotEnoughArgs
+	}
+
+	id, err := getTaskId(app.args[1], len(app.tasks))
+	if err != nil {
+		return "", err
+	}
+
+	task := app.tasks[id]
+
+	editCmd := flag.NewFlagSet("edit", flag.PanicOnError)
+
+	title := editCmd.String("title", "", "new title")
+	desc := editCmd.String("desc", "", "new description")
+	time := editCmd.String("time", "", "new deadline")
+	status := editCmd.String("status", "", "new status")
+
+	editCmd.Parse(app.args[2:])
+
+	if *title != "" {
+		task.Title = *title
+	}
+	if *desc != "" {
+		task.Description = *desc
+	}
+	if *time != "" {
+		task.Deadline, err = getDeadline(*time)
+		if err != nil {
+			return "", fmt.Errorf("%s is not a valid time", *time)
+		}
+	}
+	if *status != "" {
+		err := task.Status.UpdateStatus(*status)
 		if err != nil {
 			return "", err
 		}
-		id--
-		for i := 2; i < n; i++ {
-			switch app.args[i] {
-			case "-desc":
-				{
-					if i+1 < n {
-						app.tasks[id].Description = app.args[i+1]
-					} else {
-						return "", errors.New("Not enought args")
-					}
-					i++
-				}
-			case "-time":
-				{
-					if i+1 < n {
-						deadline, err := getDeadline(app.args[i+1])
-						if err != nil {
-							return "", fmt.Errorf("%s is not a valid time", app.args[i+1])
-						}
-						app.tasks[id].Deadline = deadline
-					} else {
-						return "", errors.New("Not enought args")
-					}
-					i++
-
-				}
-			default:
-				app.tasks[id].Title = app.args[i]
-			}
-		}
-	} else {
-		return "", errors.New("Not enought or too many args")
 	}
+
 	return "Task edited..", nil
 }
 func (app *application) swap() (string, error) {
 	// swap 1 2
 	if len(app.args) <= 3 {
 		tasklen := len(app.tasks)
-		id1, err := getInt(app.args[1], tasklen)
+		id1, err := getTaskId(app.args[1], tasklen)
 		if err != nil {
 			return "", err
 		}
-		id1--
-		id2, err := getInt(app.args[2], tasklen)
+		id2, err := getTaskId(app.args[2], tasklen)
 		if err != nil {
 			return "", err
 		}
-		id2--
 		app.tasks[id1], app.tasks[id2] = app.tasks[id2], app.tasks[id1]
 	}
 	return "Tasks swaped..", nil
@@ -248,16 +271,16 @@ func (app *application) help() {
 			options: -d(detailed), -l(long-term)
 	  -add strings.. [options]
 			Adds a task
-			options: -desc(add description), -time(time-period)
+			options: -desc(add description), -time(set time-period), -status(done, pending, overdue, paused)
 	  -rm [idxs..]
 			Removes the tasks
 	  -done [idxs..]
 			Marks the tasks completed
 	  -undo [idxs..]
 			Marks the tasks uncompleted
-	  -edit [idx] [new_title] [options]
-			Edit the title of the specified task
-			options: -desc(add description), -time(time-period)
+	  -edit [idx] [options]
+			Edit the specified task
+			options: -title(new title), -desc(new description), -time(new time-period), -status(done, pending, overdue, paused)
 	  -swap [idx_1] [idx_2]
 			Swaps the positions of the specified tasks
 	  -purge
