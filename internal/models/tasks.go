@@ -14,9 +14,9 @@ type Task struct {
 
 func (t *Tasks) Append(title string) *Task {
 	task := &Task{
-		Title: title,
-		Deadline: time.Now().Add(24*time.Hour),
-		Status: Pending,
+		Title:    title,
+		Deadline: time.Now().Add(24 * time.Hour),
+		Status:   Pending,
 	}
 	*t = append(*t, task)
 	return task
@@ -44,4 +44,16 @@ func (t *Tasks) Purge() {
 		(*t)[j] = nil
 	}
 	*t = newTasks
+}
+func (t Tasks) InsertionSort() {
+	var j int
+	for i, task := range t {
+		curr := time.Until(task.Deadline)
+		j = i - 1
+		for j >= 0 && time.Until(t[j].Deadline) > curr {
+			t[j+1] = t[j]
+			j--
+		}
+		t[j+1] = task
+	}
 }

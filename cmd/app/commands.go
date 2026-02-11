@@ -150,7 +150,7 @@ func (app *application) add() (string, error) {
 	}
 
 	app.tasks.AppendTasks(tasks)
-	insertionSort(app.tasks)
+	app.tasks.InsertionSort()
 
 	msg := "Task added to your log.."
 	if len(tasks) > 1 {
@@ -234,7 +234,7 @@ func (app *application) edit() (string, error) {
 		if err != nil {
 			return "", fmt.Errorf("%s is not a valid time", *time)
 		}
-		insertionSort(app.tasks)
+		app.tasks.InsertionSort()
 	}
 	if *status != "" {
 		err := task.Status.UpdateStatus(*status)
