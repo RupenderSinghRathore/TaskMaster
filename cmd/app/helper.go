@@ -66,15 +66,13 @@ func capitalize(s string) string {
 	}
 	return s
 }
-func notValidId(id int) error {
-	return fmt.Errorf("%d is not a valid task\n", id)
-}
-func getTaskId(s string, tasklen int) (int, error) {
+func (app *application) getTaskId(s string) (int, error) {
 	id, err := strconv.Atoi(s)
 	if err != nil {
 		return 0, err
-	} else if id < 1 || id > tasklen {
-		return 0, notValidId(id)
+	} else if id < 1 || id > len(app.tasks) {
+		return 0, fmt.Errorf("%d is not a valid task\n", id)
+
 	}
 	return id - 1, nil
 }

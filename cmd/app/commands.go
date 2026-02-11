@@ -75,7 +75,7 @@ func (app *application) log() {
 func (app *application) undo() (string, error) {
 	count := 0
 	for _, id := range app.args[1:] {
-		idx, err := getTaskId(id, len(app.tasks))
+		idx, err := app.getTaskId(id)
 		if err != nil {
 			return "", err
 		}
@@ -164,7 +164,7 @@ func (app *application) remove() (string, error) {
 	ids := make(map[int]bool, len(app.args[1:]))
 	count := 0
 	for _, id := range app.args[1:] {
-		i, err := getTaskId(id, len(app.tasks))
+		i, err := app.getTaskId(id)
 		if err != nil {
 			return "", err
 		}
@@ -183,7 +183,7 @@ func (app *application) remove() (string, error) {
 func (app *application) done() (string, error) {
 	count := 0
 	for _, id := range app.args[1:] {
-		idx, err := getTaskId(id, len(app.tasks))
+		idx, err := app.getTaskId(id)
 		if err != nil {
 			return "", err
 		}
@@ -207,7 +207,7 @@ func (app *application) edit() (string, error) {
 		return "", ErrNotEnoughArgs
 	}
 
-	id, err := getTaskId(app.args[1], len(app.tasks))
+	id, err := app.getTaskId(app.args[1])
 	if err != nil {
 		return "", err
 	}
@@ -248,12 +248,11 @@ func (app *application) edit() (string, error) {
 func (app *application) swap() (string, error) {
 	// swap 1 2
 	if len(app.args) <= 3 {
-		tasklen := len(app.tasks)
-		id1, err := getTaskId(app.args[1], tasklen)
+		id1, err := app.getTaskId(app.args[1])
 		if err != nil {
 			return "", err
 		}
-		id2, err := getTaskId(app.args[2], tasklen)
+		id2, err := app.getTaskId(app.args[2])
 		if err != nil {
 			return "", err
 		}
