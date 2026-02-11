@@ -1,7 +1,6 @@
 package main
 
 import (
-	"RupenderSinghRathore/TaskMaster/internal/models"
 	"errors"
 	"fmt"
 	"os"
@@ -80,17 +79,4 @@ func handleErr(err error) {
 	fmt.Fprintf(os.Stderr, "err: %v\n", err)
 	// fmt.Fprintf(os.Stdout, "trace: %s\n", string(debug.Stack()))
 	os.Exit(1)
-}
-
-func insertionSort(tasks models.Tasks) {
-	var j int
-	for i, task := range tasks {
-		curr := time.Until(task.Deadline)
-		j = i - 1
-		for j >= 0 && time.Until(tasks[j].Deadline) > curr {
-			tasks[j+1] = tasks[j]
-			j--
-		}
-		tasks[j+1] = task
-	}
 }
