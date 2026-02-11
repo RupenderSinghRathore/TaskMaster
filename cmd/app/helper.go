@@ -68,7 +68,6 @@ func capitalize(s string) string {
 }
 func notValidId(id int) error {
 	return fmt.Errorf("%d is not a valid task\n", id)
-
 }
 func getTaskId(s string, tasklen int) (int, error) {
 	id, err := strconv.Atoi(s)
@@ -96,13 +95,4 @@ func insertionSort(tasks models.Tasks) {
 		}
 		tasks[j+1] = task
 	}
-}
-func validateTitle(title string) error {
-	switch {
-	case title == "":
-		return errors.New("empty title")
-	case title[0] == '-':
-		return errors.New("invalid character in title")
-	}
-	return nil
 }

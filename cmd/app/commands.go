@@ -114,8 +114,8 @@ func (app *application) add() (string, error) {
 		*status = ""
 
 		title := app.args[i]
-		if err := validateTitle(title); err != nil {
-			return "", err
+		if title == "" {
+			return "", errors.New("empty title")
 		}
 
 		task := tasks.Append(capitalize(title))
