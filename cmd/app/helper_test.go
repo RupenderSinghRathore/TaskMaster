@@ -102,3 +102,48 @@ func TestGetDeadline(t *testing.T) {
 		})
 	}
 }
+
+func TestGetTimeperiod(t *testing.T) {
+	tests := []struct {
+		name       string
+		inputShift time.Duration
+		expected   string
+	}{
+		{
+			name:       "negative duration",
+			inputShift: -24 * time.Hour,
+			expected:   "💀",
+		},
+		{
+			name:       "integer duration",
+			inputShift: 2 * 24 * time.Hour,
+			expected:   "2.0d",
+		},
+		{
+			name:       "border time",
+			inputShift: 24 * time.Hour,
+			expected:   "24.0h",
+		},
+		{
+			name:       "float duration",
+			inputShift: 45 * 24 * time.Hour,
+			expected:   "1.5m",
+		},
+		{
+			name:       "hours",
+			inputShift: 4 * time.Hour,
+			expected:   "4.0h",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			input := time.Now().Add(tt.inputShift)
+			got := getTimeperiod(input)
+
+			if !reflect.DeepEqual(tt.expected, got) {
+				t.Errorf("input: %v, expected: %v, got: %v", tt.inputShift, tt.expected, got)
+			}
+		})
+	}
+}
