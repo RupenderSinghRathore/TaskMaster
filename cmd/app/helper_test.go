@@ -1,6 +1,7 @@
 package main
 
 import (
+	"RupenderSinghRathore/TaskMaster/internal/models"
 	"reflect"
 	"testing"
 	"time"
@@ -67,8 +68,10 @@ func TestGetDeadline(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			expected := time.Now().Add(tt.expectedShift)
+			expected := time.Now().Add(tt.expectedShift).Round(time.Second)
 			got, err := getDeadline(tt.input)
+			got = got.Round(time.Second)
+
 			if tt.expectedError {
 				if err == nil {
 					t.Errorf(
@@ -85,12 +88,8 @@ func TestGetDeadline(t *testing.T) {
 				t.Errorf("unexpected error: %v", err)
 			}
 
-			diff := got.Sub(expected)
-			if diff < 0 {
-				diff = -diff
-			}
-
-			if diff > time.Second {
+			if !reflect.DeepEqual(expected, got) {
+				diff := got.Sub(expected)
 				t.Errorf(
 					"input: %v, expected: %v, got: %v, diff: %v",
 					tt.input,
@@ -143,6 +142,83 @@ func TestGetTimeperiod(t *testing.T) {
 
 			if !reflect.DeepEqual(tt.expected, got) {
 				t.Errorf("input: %v, expected: %v, got: %v", tt.inputShift, tt.expected, got)
+			}
+		})
+	}
+}
+
+func TestGetTaskId(t *testing.T) {
+	mockTasks := models.Tasks{
+		{Title: "sleep"},
+		{Title: "go fuck yourself"},
+		{Title: "sleep"},
+		{Title: "go fuck yourself"},
+	}
+
+	tests := []struct {
+		name          string
+		input         string
+		expected      int
+		expectedError bool
+	}{
+		{
+			name:     "valid int",
+			input:    "3",
+			expected: 2,
+		},
+		{
+			name:          "zero",
+			input:         "0",
+			expectedError: true,
+		},
+		{
+			name:          "zero",
+			input:         "-1",
+			expectedError: true,
+		},
+		{
+			name:          "invalid int",
+			input:         "20fuck",
+			expectedError: true,
+		},
+		{
+			name:          "grater then len",
+			input:         "20",
+			expectedError: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			app := application{tasks: mockTasks}
+			got, err := app.getTaskId(tt.input)
+
+			if tt.expectedError {
+				if err == nil {
+					t.Errorf(
+						"expected error got none; input: %v, expected: %v, got: %v",
+						tt.input,
+						tt.expected,
+						got,
+					)
+				}
+				return
+			}
+			if err != nil {
+				t.Errorf(
+					"unexpected error: %v, for input: input: %v, expected: %v",
+					err,
+					tt.input,
+					tt.expected,
+				)
+			}
+			if !reflect.DeepEqual(tt.expected, got) {
+				t.Errorf(
+					"input: input: %v, expected: %v, got: %v",
+					tt.input,
+					tt.expected,
+					got,
+				)
 			}
 		})
 	}

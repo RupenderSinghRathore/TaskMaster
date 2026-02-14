@@ -33,7 +33,7 @@ func getDeadline(period string) (time.Time, error) {
 		}
 	}
 	durationNeno := count * float64(time.Hour)
-	deadline := time.Now().Add(time.Duration(durationNeno))
+	deadline := time.Now().Add(time.Duration(durationNeno)).Round(time.Second)
 	return deadline, nil
 }
 func getTimeperiod(t time.Time) string {

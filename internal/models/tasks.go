@@ -1,6 +1,8 @@
 package models
 
 import (
+	"fmt"
+	"strings"
 	"time"
 )
 
@@ -15,7 +17,7 @@ type Task struct {
 func (t *Tasks) Append(title string) *Task {
 	task := &Task{
 		Title:    title,
-		Deadline: time.Now().Add(24 * time.Hour),
+		Deadline: time.Now().Add(24 * time.Hour).Round(time.Second),
 		Status:   Pending,
 	}
 	*t = append(*t, task)
@@ -56,4 +58,16 @@ func (t Tasks) InsertionSort() {
 		}
 		t[j+1] = task
 	}
+}
+
+func (t Tasks) String() string {
+	str := strings.Builder{}
+	str.WriteString("{\n")
+	for _, task := range t {
+		if task != nil {
+			str.WriteString(fmt.Sprintf("%+v", *task))
+		}
+	}
+	str.WriteString("\n}")
+	return str.String()
 }
