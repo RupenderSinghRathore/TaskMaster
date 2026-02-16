@@ -1,17 +1,16 @@
 package models
 
 import (
-	"fmt"
-	"strings"
+	"encoding/json"
 	"time"
 )
 
 type Tasks []*Task
 type Task struct {
-	Title       string
-	Description string
-	Status      Status
-	Deadline    time.Time
+	Title       string    `json:"title"`
+	Description string    `json:"Description"`
+	Status      Status    `json:"status"`
+	Deadline    time.Time `json:"deadline"`
 }
 
 func (t *Tasks) Append(title string) *Task {
@@ -61,13 +60,6 @@ func (t Tasks) InsertionSort() {
 }
 
 func (t Tasks) String() string {
-	str := strings.Builder{}
-	str.WriteString("{\n")
-	for _, task := range t {
-		if task != nil {
-			str.WriteString(fmt.Sprintf("%+v", *task))
-		}
-	}
-	str.WriteString("\n}")
-	return str.String()
+	data, _ := json.MarshalIndent(t, "", "\t")
+	return string(data)
 }
