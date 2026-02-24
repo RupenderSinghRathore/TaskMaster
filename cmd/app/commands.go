@@ -1,13 +1,14 @@
 package main
 
 import (
-	"RupenderSinghRathore/TaskMaster/internal/models"
 	"errors"
 	"flag"
 	"fmt"
 	"io"
 	"os"
 	"time"
+
+	"RupenderSinghRathore/TaskMaster/internal/models"
 )
 
 var ErrNotEnoughArgs = errors.New("not enough args")
@@ -72,6 +73,7 @@ func (app *application) log() {
 		}
 	}
 }
+
 func (app *application) undo() (string, error) {
 	count := 0
 	for _, id := range app.args[1:] {
@@ -91,8 +93,8 @@ func (app *application) undo() (string, error) {
 		msg = "Task undone.."
 	}
 	return msg, nil
-
 }
+
 func (app *application) add() (string, error) {
 	n := len(app.args)
 	if n < 2 {
@@ -180,6 +182,7 @@ func (app *application) remove() (string, error) {
 	}
 	return msg, nil
 }
+
 func (app *application) done() (string, error) {
 	count := 0
 	for _, id := range app.args[1:] {
@@ -198,10 +201,12 @@ func (app *application) done() (string, error) {
 	}
 	return msg, nil
 }
+
 func (app *application) clear() string {
 	app.tasks = models.Tasks{}
 	return "All your logs are cleared.."
 }
+
 func (app *application) edit() (string, error) {
 	if len(app.args) < 3 {
 		return "", ErrNotEnoughArgs
@@ -218,7 +223,7 @@ func (app *application) edit() (string, error) {
 
 	title := editCmd.String("title", "", "new title")
 	desc := editCmd.String("desc", "", "new description")
-	time := editCmd.String("time", "", "new deadline")
+	t := editCmd.String("time", "", "new deadline")
 	status := editCmd.String("status", "", "new status")
 
 	editCmd.Parse(app.args[2:])
@@ -229,11 +234,15 @@ func (app *application) edit() (string, error) {
 	if *desc != "" {
 		task.Description = *desc
 	}
-	if *time != "" {
-		task.Deadline, err = getDeadline(*time)
+	if *t != "" {
+		task.Deadline, err = getDeadline(*t)
 		if err != nil {
-			return "", fmt.Errorf("%s is not a valid time", *time)
+			return "", fmt.Errorf("%s is not a valid time", *t)
 		}
+		if task.Description == "" && time.Until(task.Deadline) > Day*time.Hour {
+			task.Description = "Long term task"
+		}
+
 		app.tasks.InsertionSort()
 	}
 	if *status != "" {
@@ -245,6 +254,7 @@ func (app *application) edit() (string, error) {
 
 	return "Task edited..", nil
 }
+
 func (app *application) swap() (string, error) {
 	// swap 1 2
 	if len(app.args) <= 3 {
@@ -260,6 +270,7 @@ func (app *application) swap() (string, error) {
 	}
 	return "Tasks swaped..", nil
 }
+
 func (app *application) purge() string {
 	app.tasks.Purge()
 	return "All tasks purged.."

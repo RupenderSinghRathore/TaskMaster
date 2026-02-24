@@ -1,10 +1,11 @@
 package main
 
 import (
-	"RupenderSinghRathore/TaskMaster/internal/models"
 	"reflect"
 	"testing"
 	"time"
+
+	"RupenderSinghRathore/TaskMaster/internal/models"
 )
 
 func TestCapitalize(t *testing.T) {
