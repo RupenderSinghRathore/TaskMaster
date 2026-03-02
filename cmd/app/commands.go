@@ -13,15 +13,14 @@ import (
 
 var ErrNotEnoughArgs = errors.New("not enough args")
 
-func (app *application) log() {
+func (app *application) log() string {
 	defer func() {
 		if err := app.writer.Flush(); err != nil {
 			fmt.Fprintf(os.Stderr, "err: %s\n", err.Error())
 		}
 	}()
 	if len(app.tasks) == 0 {
-		fmt.Fprint(app.writer, "Your logs are empty..\n")
-		return
+		return "Your logs are empty.."
 	}
 	var detailed, longTerm bool
 	for _, arg := range app.args[1:] {
@@ -47,6 +46,7 @@ func (app *application) log() {
 		)
 	}
 	var isDone string
+	count := 0
 	for i, task := range app.tasks {
 		isShortTerm := time.Until(task.Deadline) < 24*time.Hour
 		if longTerm && isShortTerm {
@@ -70,8 +70,17 @@ func (app *application) log() {
 				isDone = "❌"
 			}
 			fmt.Fprintf(app.writer, "    %d >\t%s\t%s\n", i+1, task.Title, isDone)
+			count++
 		}
 	}
+	if !detailed && count == 0 {
+		if longTerm {
+			return "no longTerm logs.."
+		} else {
+			return "no shortTerm logs.."
+		}
+	}
+	return ""
 }
 
 func (app *application) undo() (string, error) {

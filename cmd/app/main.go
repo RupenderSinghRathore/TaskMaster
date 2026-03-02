@@ -1,10 +1,11 @@
 package main
 
 import (
-	"RupenderSinghRathore/TaskMaster/internal/models"
 	"fmt"
 	"os"
 	"text/tabwriter"
+
+	"RupenderSinghRathore/TaskMaster/internal/models"
 
 	"golang.org/x/term"
 )
@@ -55,12 +56,13 @@ func (app *application) handleModes() error {
 	}
 	return nil
 }
+
 func (app *application) handleArgs() (string, error) {
 	var err error
 	var msg string
 	switch app.args[0] {
 	case "log":
-		app.log()
+		msg = app.log()
 	case "add":
 		msg, err = app.add()
 	case "rm":
