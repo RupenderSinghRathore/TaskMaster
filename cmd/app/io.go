@@ -9,7 +9,8 @@ import (
 	"time"
 )
 
-const FILE = "/home/kami-sama/.tasks.csv"
+var HOME, _ = os.UserHomeDir()
+var FILE = HOME + "/.tasks.csv"
 
 func loadTasks() (models.Tasks, error) {
 
