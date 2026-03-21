@@ -8,8 +8,11 @@ import (
 	"time"
 )
 
-const (
-	Day = 24
+const ( // no. of hours
+	Day   = 24
+	Week  = Day * 7
+	Month = Week * 4
+	Year  = Month * 12
 )
 
 func getDeadline(period string) (time.Time, error) {
@@ -21,21 +24,22 @@ func getDeadline(period string) (time.Time, error) {
 	case 'd':
 		count *= Day
 	case 'w':
-		count *= Day * 7
+		count *= Week
 	case 'm':
-		count *= Day * 30
+		count *= Month
 	case 'y':
 		{
 			if count > 100 {
 				return time.Time{}, errors.New("MotherFucker you'd be dead by then.\n")
 			}
-			count *= Day * 365
+			count *= Year
 		}
 	}
 	durationNeno := count * float64(time.Hour)
 	deadline := time.Now().Add(time.Duration(durationNeno)).Round(time.Second)
 	return deadline, nil
 }
+
 func getTimeperiod(t time.Time) string {
 	rawDuration := time.Until(t)
 	hours := rawDuration.Hours()
@@ -44,12 +48,12 @@ func getTimeperiod(t time.Time) string {
 	switch {
 	case hours < 0:
 		period = "💀"
-	case hours/(Day*365) >= 1:
-		period += strconv.FormatFloat(hours/(Day*365), 'f', 1, 64) + "y"
-	case hours/(Day*30) >= 1:
-		period += strconv.FormatFloat(hours/(Day*30), 'f', 1, 64) + "m"
-	case hours/(Day*7) >= 1:
-		period += strconv.FormatFloat(hours/(Day*7), 'f', 1, 64) + "w"
+	case hours/Year >= 1:
+		period += strconv.FormatFloat(hours/Year, 'f', 1, 64) + "y"
+	case hours/Month >= 1:
+		period += strconv.FormatFloat(hours/Month, 'f', 1, 64) + "m"
+	case hours/Week >= 1:
+		period += strconv.FormatFloat(hours/Week, 'f', 1, 64) + "w"
 	case hours/Day >= 1:
 		period += strconv.FormatFloat(hours/Day, 'f', 1, 64) + "d"
 	case hours >= 1:
@@ -59,22 +63,24 @@ func getTimeperiod(t time.Time) string {
 	}
 	return period
 }
+
 func capitalize(s string) string {
 	if len(s) > 0 && s[0] >= 97 && s[0] <= 122 {
 		return string(s[0]-32) + s[1:]
 	}
 	return s
 }
+
 func (app *application) getTaskId(s string) (int, error) {
 	id, err := strconv.Atoi(s)
 	if err != nil {
 		return 0, err
 	} else if id < 1 || id > len(app.tasks) {
 		return 0, fmt.Errorf("%d is not a valid task\n", id)
-
 	}
 	return id - 1, nil
 }
+
 func handleErr(err error) {
 	fmt.Fprintf(os.Stderr, "err: %v\n", err)
 	// fmt.Fprintf(os.Stdout, "trace: %s\n", string(debug.Stack()))
