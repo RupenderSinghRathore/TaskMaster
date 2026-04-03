@@ -212,8 +212,20 @@ func (app *application) done() (string, error) {
 }
 
 func (app *application) clear() string {
-	app.tasks = models.Tasks{}
-	return "All your logs are cleared.."
+	var msg string
+	newTasks := models.Tasks{}
+	if len(app.args) > 1 && app.args[1] == "-all" {
+		msg = "All logs are cleared.."
+	} else {
+		for _, task := range app.tasks {
+			if time.Until(task.Deadline) > 24*time.Hour {
+				newTasks = append(newTasks, task)
+			}
+		}
+		msg = "All immediate logs are cleared.."
+	}
+	app.tasks = newTasks
+	return msg
 }
 
 func (app *application) edit() (string, error) {

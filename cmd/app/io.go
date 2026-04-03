@@ -1,19 +1,21 @@
 package main
 
 import (
-	"RupenderSinghRathore/TaskMaster/internal/models"
 	"encoding/csv"
 	"errors"
 	"os"
 	"strconv"
 	"time"
+
+	"RupenderSinghRathore/TaskMaster/internal/models"
 )
 
-var HOME, _ = os.UserHomeDir()
-var FILE = HOME + "/.tasks.csv"
+var (
+	HOME, _ = os.UserHomeDir()
+	FILE    = HOME + "/.tasks.csv"
+)
 
 func loadTasks() (models.Tasks, error) {
-
 	tasks := models.Tasks{}
 	f, err := os.Open(FILE)
 	if err != nil {

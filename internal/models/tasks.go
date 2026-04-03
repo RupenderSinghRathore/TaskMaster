@@ -5,13 +5,15 @@ import (
 	"time"
 )
 
-type Tasks []*Task
-type Task struct {
-	Title       string    `json:"title"`
-	Description string    `json:"Description"`
-	Status      Status    `json:"status"`
-	Deadline    time.Time `json:"deadline"`
-}
+type (
+	Tasks []*Task
+	Task  struct {
+		Title       string    `json:"title"`
+		Description string    `json:"Description"`
+		Status      Status    `json:"status"`
+		Deadline    time.Time `json:"deadline"`
+	}
+)
 
 func (t *Tasks) Append(title string) *Task {
 	task := &Task{
@@ -22,9 +24,11 @@ func (t *Tasks) Append(title string) *Task {
 	*t = append(*t, task)
 	return task
 }
+
 func (t *Tasks) AppendTasks(tasks Tasks) {
 	*t = append(*t, tasks...)
 }
+
 func (t *Tasks) Delete(ids map[int]bool) {
 	newTasks := Tasks{}
 	for j, task := range *t {
@@ -46,6 +50,7 @@ func (t *Tasks) Purge() {
 	}
 	*t = newTasks
 }
+
 func (t Tasks) InsertionSort() {
 	var j int
 	for i, task := range t {
