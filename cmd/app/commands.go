@@ -229,7 +229,7 @@ func (app *application) clear() string {
 }
 
 func (app *application) edit() (string, error) {
-	if len(app.args) < 3 {
+	if len(app.args) < 4 {
 		return "", ErrNotEnoughArgs
 	}
 
