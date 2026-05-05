@@ -56,33 +56,3 @@ func (app *application) handleModes() error {
 	}
 	return nil
 }
-
-func (app *application) handleArgs() (string, error) {
-	var err error
-	var msg string
-	switch app.args[0] {
-	case "log":
-		msg = app.log()
-	case "add":
-		msg, err = app.add()
-	case "rm":
-		msg, err = app.remove()
-	case "done":
-		msg, err = app.done()
-	case "undo":
-		msg, err = app.undo()
-	case "swap":
-		msg, err = app.swap()
-	case "purge":
-		msg = app.purge()
-	case "clear":
-		msg = app.clear()
-	case "edit":
-		msg, err = app.edit()
-	case "help":
-		app.help()
-	default:
-		return "", fmt.Errorf("%s is not a valid option, try help command", app.args[0])
-	}
-	return msg, err
-}
